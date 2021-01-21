@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Primes.Models;
 using Primes.Services;
 using System.Collections.Generic;
 
@@ -8,16 +9,30 @@ namespace Primes.Controllers
     public class PrimesController : Controller
     {
         [HttpGet("LessThanOrEqualTo/{number:int}")]
-        public ActionResult<IEnumerable<int>> LessThanOrEqualTo(int number)
+        public ActionResult<IEnumerable<int>> LessThanOrEqualTo(int number, Pagination pagination)
         {
+            if(!pagination.IsValid)
+            {
+                return BadRequest("Page and PerPage must be positive integers");
+            }
+
             var primeGenerator = new PrimeGenerator();
             var primes = new List<int>();
-            var nextPrime = primeGenerator.NextPrime();
 
-            while (nextPrime <= number)
+            var maxIndex = pagination.Page * pagination.PerPage;
+            var minIndex = maxIndex - pagination.PerPage;
+
+            for (var i = 0; i < maxIndex; i++)
             {
-                primes.Add(nextPrime);
-                nextPrime = primeGenerator.NextPrime();
+                var nextPrime = primeGenerator.NextPrime();
+                if (nextPrime > number)
+                {
+                    break;
+                }
+                if (i >= minIndex)
+                {
+                    primes.Add(nextPrime);
+                }
             }
 
             return primes;
