@@ -71,7 +71,7 @@ function App() {
   const [hasMore, setHasMore] = useState(false);
 
   const handleSubmit = async (pageToRequest: number) => {
-    const response = await fetch(`https://localhost:49165/Primes/LessThanOrEqualTo/${lessThanOrEqualTo}?page=${pageToRequest}&perPage=${pageSize}`);
+    const response = await fetch(`http://localhost:46000/Primes/LessThanOrEqualTo/${lessThanOrEqualTo}?page=${pageToRequest}&perPage=${pageSize}`);
     const pagedResponse = await response.json() as PagedResponse<number> | string;
     if (typeof pagedResponse === "string") {
       return;
