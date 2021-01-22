@@ -28,12 +28,15 @@ const Input = styled.input`
 `
 
 const ColoredButton = styled.button`
-  width: 160px;
+  width: 80px;
   padding: 5px 10px;
   text-align: center;
   background-color: #0071ED;
   color: #fff;
   border: none;
+  @media screen and (min-width: 480px) {
+    width: 160px;
+  }
 `;
 
 const Pagination = styled.div`
