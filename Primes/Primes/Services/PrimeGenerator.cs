@@ -1,37 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Primes.Services
 {
     public class PrimeGenerator
     {
-        private List<int> _previousPrimes = new List<int>();
+        // seed with first two primes, as from here, we only need to check odd numbers
+        private List<int> _generatedPrimes = new List<int>() { 2, 3 };
+        private int _index = 0;
+
+        public void Reset()
+        {
+            _index = 0;
+        }
+
         public int NextPrime()
         {
-            if (!_previousPrimes.Any())
+            while (_generatedPrimes.Count < _index + 1)
             {
-                // we know first prime is 2.
-                _previousPrimes.Add(2);
-                return 2;
+                GeneratePrime();
             }
 
-            if (_previousPrimes.Count == 1)
-            {
-                // special case as increments by 1, every
-                // prime after this is odd, so we can increment
-                // the number to check by 2.
-                _previousPrimes.Add(3);
-                return 3;
-            }
+            var prime = _generatedPrimes[_index];
+            _index++;
+            return prime;
+        }
 
-            var numberToCheck = _previousPrimes.Last() + 2;
+        public void GeneratePrime()
+        {
+            var numberToCheck = _generatedPrimes.Last() + 2;
 
-            while(true)
+            while (true)
             {
                 var sqrt = Math.Sqrt(numberToCheck);
-                foreach(var prime in _previousPrimes)
+                foreach (var prime in _generatedPrimes)
                 {
                     if (prime > sqrt)
                     {
@@ -39,8 +42,8 @@ namespace Primes.Services
                         // the square of our number, else the number
                         // is prime. Therefore we know this number
                         // is prime.
-                        _previousPrimes.Add(numberToCheck);
-                        return numberToCheck;
+                        _generatedPrimes.Add(numberToCheck);
+                        return;
                     }
                     if (numberToCheck % prime == 0)
                     {
@@ -52,7 +55,7 @@ namespace Primes.Services
                         break;
                     }
                 }
-                if(numberToCheck == int.MaxValue)
+                if (numberToCheck == int.MaxValue)
                 {
                     throw new InvalidOperationException("Maximum value for integer reached, no more primes.");
                 }

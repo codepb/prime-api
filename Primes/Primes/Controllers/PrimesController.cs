@@ -8,6 +8,13 @@ namespace Primes.Controllers
     [Route("Primes")]
     public class PrimesController : Controller
     {
+        private readonly PrimeGenerator _primeGenerator;
+
+        public PrimesController(PrimeGenerator primeGenerator)
+        {
+            _primeGenerator = primeGenerator;
+        }
+
         [HttpGet("LessThanOrEqualTo/{number:int}")]
         public ActionResult<PagedResponse<int>> LessThanOrEqualTo(int number, Pagination pagination)
         {
@@ -16,7 +23,8 @@ namespace Primes.Controllers
                 return BadRequest("Page and PerPage must be positive integers");
             }
 
-            var primeGenerator = new PrimeGenerator();
+            _primeGenerator.Reset();
+
             var primes = new List<int>();
 
             var maxIndex = pagination.Page * pagination.PerPage;
@@ -24,7 +32,7 @@ namespace Primes.Controllers
 
             for (var i = 0; i < maxIndex; i++)
             {
-                var nextPrime = primeGenerator.NextPrime();
+                var nextPrime = _primeGenerator.NextPrime();
                 if (nextPrime > number)
                 {
                     break;
@@ -39,7 +47,7 @@ namespace Primes.Controllers
             {
                 Page = pagination.Page,
                 PerPage = pagination.PerPage,
-                HasMore = primeGenerator.NextPrime() <= number,
+                HasMore = _primeGenerator.NextPrime() <= number,
                 Items = primes
             };
         }
