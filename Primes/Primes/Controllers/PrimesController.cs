@@ -9,7 +9,7 @@ namespace Primes.Controllers
     public class PrimesController : Controller
     {
         [HttpGet("LessThanOrEqualTo/{number:int}")]
-        public ActionResult<IEnumerable<int>> LessThanOrEqualTo(int number, Pagination pagination)
+        public ActionResult<PagedResponse<int>> LessThanOrEqualTo(int number, Pagination pagination)
         {
             if(!pagination.IsValid)
             {
@@ -35,7 +35,13 @@ namespace Primes.Controllers
                 }
             }
 
-            return primes;
+            return new PagedResponse<int>
+            {
+                Page = pagination.Page,
+                PerPage = pagination.PerPage,
+                HasMore = primeGenerator.NextPrime() <= number,
+                Items = primes
+            };
         }
     }
 }

@@ -45,6 +45,7 @@ const Pagination = styled.div`
 
 const ResultContainer = styled.div`
   padding: 10px;
+  height: 340px;
 `
 
 const Result = styled.div`
@@ -55,15 +56,28 @@ const Result = styled.div`
   }
 `;
 
+interface PagedResponse<T> {
+  page: number;
+  perPage: number;
+  hasMore: boolean;
+  items: T[];
+}
+
 function App() {
   const [data, setData] = useState<number[]>([]);
   const [lessThanOrEqualTo, setLessThanOrEqualTo] = useState('');
   const [pageSize, setPageSize] = useState('10');
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
 
   const handleSubmit = async (pageToRequest: number) => {
     const response = await fetch(`https://localhost:49165/Primes/LessThanOrEqualTo/${lessThanOrEqualTo}?page=${pageToRequest}&perPage=${pageSize}`);
-    setData(await response.json());
+    const pagedResponse = await response.json() as PagedResponse<number> | string;
+    if (typeof pagedResponse === "string") {
+      return;
+    }
+    setData(pagedResponse.items);
+    setHasMore(pagedResponse.hasMore);
   }
 
   const nextPage = () => {
@@ -92,7 +106,7 @@ function App() {
       </ResultContainer>
       <Pagination>
         {page > 1 ? <ColoredButton onClick={previousPage}>Previous Page</ColoredButton> : <div></div>}
-        {data.length > 0 ? <ColoredButton onClick={nextPage}>Next Page</ColoredButton> : <div></div>}
+        {hasMore ? <ColoredButton onClick={nextPage}>Next Page</ColoredButton> : <div></div>}
       </Pagination>
     </Container>
   );
